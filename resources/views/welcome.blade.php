@@ -107,10 +107,14 @@
 </style>
 
 <div class="game-welcome-container">
+    @if (!$nama)
+        <h1>Selamat Datang</h1>
+        <p>Silakan buat nickname untuk memulai petualanganmu</p>
+    @else
     <h1>Selamat Datang, <span style="color: #d4af37;">{{$nama}}</span>!</h1>
     <h2 id="nickname" hidden>{{$nama}}</h2>
+    @endif
 
-    <p>Pilih jalanmu, petualang:</p>
 
     <div style="display: flex; flex-direction: column; align-items: center;">
         <a href="{{route('createNickName')}}">

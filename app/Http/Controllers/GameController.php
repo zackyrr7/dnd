@@ -607,6 +607,65 @@ Akhiri narasi dengan situasi terbuka, tantangan baru, atau konsekuensi dari aksi
     }
 
 
+    public function finishGame(Request $request, GeminiService $gemini)
+{
+    $room = $request->room;
+
+    DB::beginTransaction();
+
+    try {
+        $roomData = DB::table('rooms')->where('room', $room)->first();
+
+        if (!$roomData) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Room tidak ditemukan.'
+            ], 404);
+        }
+
+        // Decode log sebelumnya
+        $storyLog = json_decode($roomData->story_log, true) ?? [];
+        $premis = $roomData->premis ?? 'Premis tidak tersedia.';
+
+        // Buat prompt AI
+        $prompt = "Para player memutuskan untuk menyelesaikan cerita ini.\n\n".
+        "   - Gunakan gaya narasi seperti dungeon master dalam game fantasi.
+        - Maksimal 4-5 kalimat.".
+                  "Berikut adalah premis cerita:\n" . $premis . "\n\n".
+                  "Dan berikut adalah log perjalanan cerita:\n" . implode("\n", $storyLog) . "\n\n".
+                  "Buat penutup cerita yang menarik, menyatu secara logis dengan alur sebelumnya, dan memberi kesan penutup yang memuaskan.";
+
+        // Dapatkan penutup cerita dari Gemini
+        $penutup = $gemini->ask($prompt);
+        $storyLog[] = "GM: {$penutup}";
+
+        // Update room
+        DB::table('rooms')->where('room', $room)->update([
+            'status_game' => 'Finished',
+            'story_log' => json_encode($storyLog),
+            'current_turn_token' => 'finished'
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cerita berhasil diselesaikan.',
+            'roll_required' => false,
+            'next_story' => $penutup,
+            'current_turn_token' => 'finished'
+        ]);
+
+    } catch (\Throwable $th) {
+        DB::rollBack();
+        return response()->json([
+            'status' => false,
+            'message' => 'Terjadi kesalahan: ' . $th->getMessage()
+        ], 500);
+    }
+}
+
+
 
 
 

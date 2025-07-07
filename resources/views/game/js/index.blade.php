@@ -53,6 +53,31 @@
     }
 }
 
+
+        function finish() {
+            $.ajax({
+                url: "{{ route('finish') }}",
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    room: room,
+                    _token: "{{ csrf_token() }}"
+                }),
+                success: function(response) {
+                    if (response.status) {
+                        $('#user-action').val('');
+                        $('#roll-dice-btn').hide();
+                        fetchGameData();
+                    } else {
+                        alert('Gagal menyelesaikan cerita: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Kesalahan jaringan saat menyelesaikan cerita.');
+                }
+            });
+        }
+
     
         function fetchGameData() {
             $.ajax({
@@ -195,6 +220,12 @@
         }
     });
 });
+$('.finish').on('click', function() {
+        let confirmation = confirm("Apakah kamu mau menyelesaikan cerita ini?")
+        if (confirmation == true) {
+           finish();
+        }
+    })
 
 $('#roll-dice-btn').on('click', function () {
         const $dice = $('#dice-result');
@@ -220,5 +251,8 @@ $('#roll-dice-btn').on('click', function () {
         fetchGameData();
         setInterval(fetchGameData, 5000);
     });
+
+
+   
     </script>
     

@@ -85,3 +85,4 @@ Route::post('aiTurn', [GameController::class, 'aiTurn'])->name('aiTurn');
 Route::get('getNickname', [GameController::class, 'getNickname'])->name('getNickname');
 Route::post('actionButton', [GameController::class, 'actionButton'])->name('actionButton');
 Route::post('rollDice', [GameController::class, 'rollDice'])->name('rollDice');
+Route::post('finishGame', [GameController::class, 'finishGame'])->name('finish');

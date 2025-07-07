@@ -122,6 +122,19 @@
             max-width: 700px;
             margin: 0 auto;
         }
+
+        .finish {
+            display: flex;
+           justify-content: center;
+           margin-top: 20px;
+        }
+
+        .finish-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
         @keyframes shakeDice {
             0% { transform: rotate(0deg) scale(1); }
             25% { transform: rotate(10deg) scale(1.1); }
@@ -156,6 +169,18 @@
             <button id="send-action-btn">📜 Kirim Aksi</button>
         </div>
     </div>
+
+    @php
+        $rm = cekRM(request('room'));   
+    @endphp
+
+   
+
+    @if ($rm === true)
+    <div class="finish-container">
+        <button class="finish">Selesaikan Cerita</button>
+    </div>
+@endif
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @include('game.js.index')
